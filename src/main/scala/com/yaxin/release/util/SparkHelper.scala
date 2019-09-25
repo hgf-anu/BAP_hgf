@@ -74,10 +74,10 @@ object SparkHelper{
 				}
 			}
 		}catch {
-			case ex:Exception => {
+			case ex:Exception =>
 				println("参数不匹配")
 				logger.error(ex.getMessage,ex)
-			}
+
 		}
 		bdp_days
 	}
