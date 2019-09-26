@@ -1,6 +1,7 @@
 package com.yaxin.release.util
 
 import com.sun.xml.bind.v2.TODO
+import com.yaxin.release.etl.udf.UDFAgeRange
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
@@ -9,21 +10,23 @@ import scala.collection.mutable.ArrayBuffer
 
 /**
   * Spark工具类:
-  * (1)创建sparksession
-  * (2)生成时间长度的数组
-  * (3)读hive表中的数据
-  * (4)写入hive表中的数据
-  *
+  * (1)创建sparksession (conf:SparkConf):SparkSession
+  * (2)生成时间长度的数组 (begin:String, end:String) :Seq[String]
+  * (3)读hive表中的数据 (spark: SparkSession, tableName: String, colNames: ArrayBuffer[String]) :DataFrame
+  * (4)写入hive表中的数据 (sourceDF: Dataset[Row], tableName: String, saveMode: SaveMode) :Unit
+  * (5)注册udf,参数是一个函数 (spark:SparkSession) :Unit
   */
 object SparkHelper{
 
 	/**
 	*日志对象
 	  */
+	//	工厂模式,getLogger(该类的类名)
 	private val logger: Logger = LoggerFactory.getLogger(SparkHelper.getClass)
 
+
 	/**
-	  * 创建SparkSession
+	  * (1)创建SparkSession
 	  *
 	  * @param conf 配置文件
 	  * @return
@@ -31,17 +34,15 @@ object SparkHelper{
 	def createSpark(conf:SparkConf):SparkSession = {
 		val spark: SparkSession = SparkSession.builder()
 		            .config(conf)
+		            //开启spark支持hive
 		            .enableHiveSupport()
 		            .getOrCreate()
-
-		// TODO 加载自定义函数
-
-
+		registerFun(spark)
 		spark
 	}
 
 	/**
-	*   时间参数校验
+	*   (2)时间参数校验
 	* @param begin 开始时间
 	* @param end 结束时间
 	* @return 返回值是一个包含一个或者多个日期的集合
@@ -83,7 +84,7 @@ object SparkHelper{
 	}
 
 	/**
-	  * 读取表的数据
+	  * (3)读取表的数据
 	  * @param spark SparkSession
 	  * @param tableName 表名->ods层log表
 	  * @param colNames 被设置条件的列
@@ -97,7 +98,7 @@ object SparkHelper{
 	}
 
 	/**
-	* 从传来的df插入到hive中
+	* (4)从传来的df插入到hive中
 	* @param sourceDF 源 DataFrame
 	* @param tableName 表名
 	* @param saveMode 存储模式
@@ -105,6 +106,15 @@ object SparkHelper{
 	def writeTableData(sourceDF: Dataset[Row], tableName: String, saveMode: SaveMode) :Unit = {
 		//df插入到表中
 		sourceDF.write.mode(saveMode).insertInto(tableName)
+	}
+
+	/**
+	  * (5)注册udf
+	  * @param spark sparkSession
+	  */
+	def registerFun(spark:SparkSession) :Unit= {
+		//处理年龄段,方法需要转成函数,使用空格加下划线即可
+		spark.udf.register( "getAgeRange", UDFAgeRange.getAgeRange _ )
 	}
 
 }

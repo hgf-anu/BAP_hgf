@@ -69,6 +69,10 @@ object DWReleaseCustomer{
 			//收集错误信息到日志文件
 			case ex:Exception =>
 				logger.error( ex.getMessage, ex )
+		}finally {
+			if(spark != null){
+				spark.stop()
+			}
 		}
 	}
 
