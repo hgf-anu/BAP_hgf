@@ -12,6 +12,7 @@ import scala.collection.mutable.ArrayBuffer
 class DMUserAction{
 
 }
+
 object DMUserAction{
 	private val logger:Logger = LoggerFactory.getLogger( DMReleaseCustomer.getClass )
 
@@ -55,7 +56,7 @@ object DMUserAction{
 		}
 	}
 
-/
+
 	def handleReleaseJob(spark:SparkSession, appName:String, bdp_date:String):Unit ={
 		// 导入内置函数和隐式转换
 		import org.apache.spark.sql.functions._
@@ -71,17 +72,13 @@ object DMUserAction{
 
 			val customerReleaseDF:DataFrame = SparkHelper.readTableData( spark,
 			                                                             "dm_user_action",
-			                                                             userActionColumns )
-			                                  .where( userActionCondition )
-			                                  .persist()
+			                                                             userActionColumns ).where( userActionCondition ).persist()
 
-			val customerSourceDMDF:DataFrame = customerReleaseDF
-			                                   .groupBy( col("user") )
-			                                   .agg( sum("uscore"))
-			                                   .withColumn( "bdp_day",
-			                                                lit( bdp_date ) )
-			                                   //2.4查询出字段结果
-			                                   .selectExpr( userActionColumns:_* )
+			val customerSourceDMDF:DataFrame = customerReleaseDF.groupBy( col( "user" ) ).agg( sum( "uscore" ) ).withColumn(
+				"bdp_day",
+				lit( bdp_date ) )
+			                                                    //2.4查询出字段结果
+			                                                    .selectExpr( userActionColumns:_* )
 			//测试,输出到控制台
 			customerSourceDMDF.show( 10, false )
 		} catch {
