@@ -24,7 +24,7 @@
         <fastxml.jackson.version>2.9.3</fastxml.jackson.version>
         <guava.version>21.0</guava.version>
         <mysql.jdbc.version>5.1.44</mysql.jdbc.version>
-        <protobuf.version>3.5.1</protobuf.version>
+        <protobuf.version>3.16.1</protobuf.version>
         <commons-lang3.version>3.4</commons-lang3.version>
         <commons-io.version>2.4</commons-io.version>
         <commons-csv.version>1.6</commons-csv.version>
