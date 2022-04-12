@@ -31,7 +31,7 @@
 
         <!-- bigdata -->
         <scala.version>2.11.8</scala.version>
-        <hadoop.version>2.7.6</hadoop.version>
+        <hadoop.version>3.2.3</hadoop.version>
         <hive.version>2.1.1</hive.version>
         <spark.version>2.2.3</spark.version>
         <canal.version>1.1.2</canal.version>
